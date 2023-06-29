@@ -10,7 +10,7 @@ import Foundation
 import Accelerate
 
 public class PolynomialRegression {
-    public static func regression(withPoints points: [CGPoint], degree: Int) -> [Double]? {
+    public static func regression(withPoints points: [CGPoint], degree: Int) throws -> [Double]? {
         guard degree > 0 else {
             return nil
         }
@@ -25,13 +25,13 @@ public class PolynomialRegression {
         
         do {
             //solve A x = b
-            coefficients = try solveLinearSystem(a: A.asVector,
+			coefficients = try solveLinearSystem(a: A.asVector,
                                   a_rowCount: A.rows,
                                   a_columnCount: A.columns,
                                   b: b.asVector,
                                   b_count: b.rows)
         } catch {
-            fatalError("Unable to solve linear system.")
+			throw PolynomialRegressionError.unableSolveLinearSystem
         }
                 
         return coefficients
@@ -157,4 +157,8 @@ public class PolynomialRegression {
         case parameterHasIllegalValue(parameterIndex: Int)
         case diagonalElementOfTriangularFactorIsZero(index: Int)
     }
+	
+	public enum PolynomialRegressionError: Error {
+		case unableSolveLinearSystem
+	}
 }
